@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<title>Minha Apresentação (Controle Remoto)</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+		<!-- Reveal.js CSS via CDN -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css" />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme" />
+
+		<!-- Tema para destaque de sintaxe de código -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css" />
+
+		<!-- Socket.io & QR Code Library via CDN -->
+		<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+
+		<style>
+			/* Estilos do Widget de Controle Remoto (para o Notebook/Receptor) */
+			.multiplex-widget {
+				position: fixed;
+				bottom: 20px;
+				right: 20px;
+				z-index: 9999;
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+			}
+			.multiplex-btn {
+				width: 50px;
+				height: 50px;
+				border-radius: 50%;
+				background: rgba(255, 255, 255, 0.15);
+				backdrop-filter: blur(10px);
+				-webkit-backdrop-filter: blur(10px);
+				border: 1px solid rgba(255, 255, 255, 0.25);
+				color: white;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+				transition: all 0.3s ease;
+			}
+			.multiplex-btn:hover {
+				background: rgba(255, 255, 255, 0.25);
+				transform: scale(1.05);
+			}
+			.multiplex-panel {
+				display: none;
+				position: absolute;
+				bottom: 60px;
+				right: 0;
+				width: 280px;
+				background: rgba(20, 20, 20, 0.85);
+				backdrop-filter: blur(20px);
+				-webkit-backdrop-filter: blur(20px);
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				border-radius: 16px;
+				padding: 20px;
+				box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+				color: white;
+				text-align: center;
+				animation: fadeIn 0.3s ease;
+			}
+			@keyframes fadeIn {
+				from { opacity: 0; transform: translateY(10px); }
+				to { opacity: 1; transform: translateY(0); }
+			}
+			.multiplex-panel h3 {
+				margin: 0 0 10px 0;
+				font-size: 16px;
+				font-weight: 600;
+				color: #4facfe;
+			}
+			.multiplex-panel p {
+				margin: 0 0 15px 0;
+				font-size: 12px;
+				color: #ccc;
+				line-height: 1.4;
+			}
+			.qr-container {
+				background: white;
+				padding: 10px;
+				border-radius: 8px;
+				display: inline-block;
+				margin-bottom: 15px;
+			}
+			.qr-container canvas {
+				display: block;
+			}
+			.multiplex-link-btn {
+				background: #4facfe;
+				border: none;
+				color: white;
+				padding: 8px 16px;
+				border-radius: 20px;
+				font-size: 12px;
+				cursor: pointer;
+				font-weight: 600;
+				margin-right: 5px;
+				transition: background 0.2s;
+			}
+			.multiplex-link-btn:hover {
+				background: #00f2fe;
+			}
+			.multiplex-reset-btn {
+				background: transparent;
+				border: 1px solid rgba(255, 255, 255, 0.3);
+				color: #ccc;
+				padding: 7px 14px;
+				border-radius: 20px;
+				font-size: 11px;
+				cursor: pointer;
+				transition: all 0.2s;
+			}
+			.multiplex-reset-btn:hover {
+				border-color: #ff4f4f;
+				color: #ff4f4f;
+			}
+			/* Botões flutuantes para celular (Apresentador / Master) */
+			.mobile-controls {
+				position: fixed;
+				bottom: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 9999;
+				display: flex;
+				gap: 15px;
+				background: rgba(0, 0, 0, 0.7);
+				backdrop-filter: blur(15px);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				padding: 10px 20px;
+				border-radius: 30px;
+				box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+			}
+			.mobile-btn {
+				background: rgba(255, 255, 255, 0.1);
+				border: none;
+				color: white;
+				font-size: 24px;
+				width: 50px;
+				height: 50px;
+				border-radius: 50%;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: background 0.2s, transform 0.1s;
+			}
+			.mobile-btn:active {
+				background: rgba(255, 255, 255, 0.3);
+				transform: scale(0.95);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="reveal">
+			<!-- Coloque seus slides aqui! -->
+			<div class="slides">
+				<section>
+					<h1>Minha Apresentação</h1>
+					<p>Controle remoto pelo celular configurado!</p>
+					<p><small>Pressione espaço ou use as setas para navegar.</small></p>
+				</section>
+
+				<section>
+					<h2>Slide 2</h2>
+					<p>Isso está rodando via CDN.</p>
+				</section>
+
+				<section>
+					<h2>Slide 3</h2>
+					<p>Sem necessidade de rodar servidor local ou clonar repositório grande!</p>
+				</section>
+
+				<section>
+					<h2>Fim</h2>
+					<p>Basta publicar este arquivo index.html no seu GitHub Pages.</p>
+				</section>
+			</div>
+		</div>
+
+		<!-- Elementos de Interface do Controle Remoto -->
+		<!-- Widget Multiplex (Exibido no Laptop/Receptor) -->
+		<div id="multiplex-widget" class="multiplex-widget" style="display: none;">
+			<button class="multiplex-btn" onclick="toggleMultiplexPanel()" title="Controle Remoto">
+				<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+					<line x1="12" y1="18" x2="12.01" y2="18"></line>
+				</svg>
+			</button>
+			<div id="multiplex-panel" class="multiplex-panel">
+				<h3>Controle pelo Celular</h3>
+				<p>Escaneie o QR Code abaixo com a câmera do seu celular para controlar a apresentação remotamente:</p>
+				<div class="qr-container">
+					<canvas id="qr-code"></canvas>
+				</div>
+				<div>
+					<button class="multiplex-link-btn" onclick="copyPresenterLink()">Copiar Link</button>
+					<button class="multiplex-reset-btn" onclick="resetMultiplex()">Resetar</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Controles Mobile (Exibido apenas no Celular/Apresentador) -->
+		<div id="mobile-controls" class="mobile-controls" style="display: none;">
+			<button class="mobile-btn" onclick="Reveal.prev()">◀</button>
+			<span style="color: rgba(255,255,255,0.7); display:flex; align-items:center; font-size: 14px; font-weight:600; font-family:sans-serif;">Controle</span>
+			<button class="mobile-btn" onclick="Reveal.next()">▶</button>
+		</div>
+
+		<!-- Scripts do Reveal.js e Plugins via CDN -->
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/zoom/zoom.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/search/search.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/markdown/markdown.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+
+		<script>
+			// Parâmetros de URL
+			const urlParams = new URLSearchParams(window.location.search);
+			let secret = urlParams.get('secret');
+			let id = urlParams.get('id');
+			let isMaster = !!secret;
+
+			// Servidor Multiplex em Nuvem
+			const multiplexUrl = 'https://multiplex.up.railway.app';
+
+			function initRevealWithMultiplex(multiplexConfig) {
+				Reveal.initialize({
+					controls: !isMaster, // Oculta setas nativas no celular para liberar espaço
+					progress: true,
+					center: true,
+					hash: true,
+					multiplex: multiplexConfig,
+					plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+				}).then(() => {
+					if (multiplexConfig) {
+						setupMultiplexConnection(multiplexConfig);
+					}
+				});
+			}
+
+			function setupMultiplexConnection(config) {
+				if (typeof io === 'undefined') {
+					console.warn('Socket.io não carregado. O controle remoto não funcionará offline.');
+					return;
+				}
+
+				const socket = io.connect(config.url);
+
+				if (isMaster) {
+					// Modo Celular (Envia comandos)
+					document.getElementById('mobile-controls').style.display = 'flex';
+					
+					function postState() {
+						socket.emit('multiplex-statechanged', {
+							state: Reveal.getState(),
+							secret: config.secret,
+							socketId: config.id
+						});
+					}
+
+					Reveal.on('slidechanged', postState);
+					Reveal.on('fragmentshown', postState);
+					Reveal.on('fragmenthidden', postState);
+					Reveal.on('overviewhidden', postState);
+					Reveal.on('overviewshown', postState);
+					Reveal.on('paused', postState);
+					Reveal.on('resumed', postState);
+					
+					setTimeout(postState, 1000);
+				} else {
+					// Modo Notebook (Recebe comandos)
+					document.getElementById('multiplex-widget').style.display = 'block';
+
+					socket.on(config.id, function(data) {
+						if (data.socketId !== config.id) return;
+						Reveal.setState(data.state);
+					});
+
+					generatePresenterQR();
+				}
+			}
+
+			let presenterLink = '';
+			function generatePresenterQR() {
+				const currentUrl = window.location.origin + window.location.pathname;
+				presenterLink = `${currentUrl}?secret=${secret}&id=${id}`;
+				
+				new QRious({
+					element: document.getElementById('qr-code'),
+					value: presenterLink,
+					size: 200
+				});
+			}
+
+			window.toggleMultiplexPanel = function() {
+				const panel = document.getElementById('multiplex-panel');
+				panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+			}
+
+			window.copyPresenterLink = function() {
+				navigator.clipboard.writeText(presenterLink).then(() => {
+					alert('Link do apresentador copiado para a área de transferência!');
+				}).catch(err => {
+					alert('Erro ao copiar link. Copie do console.');
+					console.log('Presenter Link:', presenterLink);
+				});
+			}
+
+			window.resetMultiplex = function() {
+				sessionStorage.removeItem('multiplex_secret');
+				sessionStorage.removeItem('multiplex_id');
+				window.location.reload();
+			}
+
+			// Fluxo principal
+			if (isMaster) {
+				initRevealWithMultiplex({
+					secret: secret,
+					id: id,
+					url: multiplexUrl
+				});
+			} else {
+				// Verifica se já temos uma sessão salva no navegador
+				let savedSecret = sessionStorage.getItem('multiplex_secret');
+				let savedId = sessionStorage.getItem('multiplex_id');
+
+				if (savedSecret && savedId) {
+					secret = savedSecret;
+					id = savedId;
+					initRevealWithMultiplex({
+						secret: null,
+						id: id,
+						url: multiplexUrl
+					});
+				} else {
+					// Solicita um novo token ao servidor em nuvem
+					fetch(`${multiplexUrl}/token`)
+						.then(response => response.json())
+						.then(data => {
+							secret = data.secret;
+							id = data.socketId;
+							sessionStorage.setItem('multiplex_secret', secret);
+							sessionStorage.setItem('multiplex_id', id);
+							
+							initRevealWithMultiplex({
+								secret: null,
+								id: id,
+								url: multiplexUrl
+							});
+						})
+						.catch(error => {
+							console.error('Erro ao buscar token multiplex:', error);
+							initRevealWithMultiplex(null); // Fallback offline normal
+						});
+				}
+			}
+		</script>
+	</body>
+</html>
