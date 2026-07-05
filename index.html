@@ -1,64 +1,132 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Slides — Menu</title>
 
-  <title>Reveal Multiplex Test</title>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reset.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/night.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css"
+		/>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="css/base.css" />
+		<link rel="stylesheet" href="css/menu.css" />
+	</head>
+	<body>
+		<div class="wrap" id="menu" hidden>
+			<header class="hero">
+				<p class="eyebrow">Índice</p>
+				<h1>Meus Slides</h1>
+				<p>Apresentações em reveal.js publicadas neste GitHub Pages.</p>
+				<p>
+					As apresentações podem ser vistas localmente, ou acompanhadas ao vivo.
+				</p>
+			</header>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/black.css">
+			<div class="legend">
+				<div class="legend-item">
+					<span class="legend-icon">
+						<svg
+							width="18"
+							height="18"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M14 18a2 2 0 0 0-4 0" />
+							<path
+								d="m19 11-2.11-6.657a2 2 0 0 0-2.752-1.148l-1.276.61A2 2 0 0 1 12 4H8.5a2 2 0 0 0-1.925 1.456L5 11"
+							/>
+							<path d="M2 11h20" />
+							<circle cx="17" cy="18" r="3" />
+							<circle cx="7" cy="18" r="3" />
+						</svg>
+					</span>
+					<span>Veja os slides localmente.</span>
+				</div>
+				<div class="legend-item">
+					<span class="legend-icon">
+						<svg
+							width="18"
+							height="18"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path
+								d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"
+							/>
+							<circle cx="12" cy="12" r="3" />
+						</svg>
+					</span>
+					<span>Assista à apresentação ao vivo.</span>
+				</div>
+				<div class="legend-item">
+					<span class="legend-icon">
+						<svg
+							width="18"
+							height="18"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M2 3h20" />
+							<path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3" />
+							<path d="m7 21 5-5 5 5" />
+						</svg>
+					</span>
+					<span>Controle a apresentação (exige autenticação).</span>
+				</div>
+			</div>
+			<main id="menu-grid" class="grid">
+				<p class="empty">Carregando apresentações…</p>
+			</main>
+		</div>
 
-  <!-- Socket.io (OBRIGATÓRIO pro multiplex) -->
-  <script src="https://multiplex.up.railway.app/"></script>
-</head>
+		<div class="reveal" id="deck-container" hidden>
+			<div class="slides"></div>
+		</div>
 
-<body>
+		<div id="sync-status" hidden></div>
 
-<div class="reveal">
-  <div class="slides">
-    <section>
-      <h2>Slide 1</h2>
-    </section>
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
 
-    <section>
-      <h2>Slide 2</h2>
-    </section>
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/markdown/markdown.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/math/math.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/search/search.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/zoom/zoom.js"></script>
 
-    <section>
-      <h2>Slide 3</h2>
-    </section>
-  </div>
-</div>
+		<script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
 
-<!-- Reveal 5 -->
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
-
-<!-- Plugins básicos -->
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/markdown/markdown.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.js"></script>
-
-<!-- Multiplex plugin (versão antiga compatível) -->
-<script src="https://cdn.jsdelivr.net/gh/reveal/multiplex/client.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/reveal/multiplex/master.js"></script>
-
-<script>
-  const isMaster = window.location.search.includes('master');
-
-  Reveal.initialize({
-    hash: true,
-
-    multiplex: {
-      secret: isMaster ? "8fb1fdcc821956d175c5709ab1ab83a5" : null,
-      id: "6f2536d385b9c2244214b48b2f5e9f1272f6d6436e91444c5e83e598d381011d",
-      url: "https://multiplex.up.railway.app"
-    },
-
-    plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
-  });
-</script>
-
-</body>
+		<script src="js/util.js"></script>
+		<script src="js/crypto.js"></script>
+		<script src="js/menu.js"></script>
+		<script src="js/presentation.js"></script>
+		<script src="js/ably.js"></script>
+		<script src="js/app.js"></script>
+	</body>
 </html>

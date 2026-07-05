@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Slides — Configuração</title>
+		<link rel="stylesheet" href="../css/base.css" />
+		<link rel="stylesheet" href="setup.css" />
+	</head>
+	<body>
+		<div class="wrap">
+			<header class="hero">
+				<p class="eyebrow">Configuração</p>
+				<h1>Ably keys</h1>
+				<p>
+					Insira as keys criadas no
+					<a href="https://ably.com/dashboard">Ably</a>, host é encriptada
+					usando uma senha sua.
+				</p>
+				<p>
+					página monta o json pronto para ser colado em
+					<code>ably-config.json</code>.
+				</p>
+			</header>
+
+			<div class="setup-content">
+				<form id="setup-form">
+					<label for="viewer-key"
+						>Ably viewer key
+						<span class="tag tag-open">fica em texto puro</span></label
+					>
+					<input
+						id="viewer-key"
+						type="text"
+						autocomplete="off"
+						placeholder="appId.keyId:keySecret"
+					/>
+
+					<label for="host-key"
+						>Ably host key <span class="tag">será cifrada</span></label
+					>
+					<input
+						id="host-key"
+						type="text"
+						autocomplete="off"
+						placeholder="appId.keyId:keySecret"
+					/>
+
+					<label for="setup-password">Senha</label>
+					<input id="setup-password" type="password" autocomplete="off" />
+					<p class="hint">
+						Só sua, não é salva em lugar algum. Usada para decriptar a host key.
+					</p>
+
+					<button id="setup-generate" type="button">
+						Gerar ably-config.json
+					</button>
+				</form>
+
+				<div class="explainer">
+					<p><strong>Por que só a host key é cifrada?</strong></p>
+					<p>
+						A host key tem permissão de publicar, quem tiver acesso pode assumir
+						o controle. Por isso ela passa por criptografia (PBKDF2 + AES-GCM,
+						direto no navegador) antes de ir pro repositório, e só é decriptada
+						na hora que você digita a senha pra apresentar.
+					</p>
+					<p>
+						A viewer key só tem permissão de assinar (escutar). Mesmo estando
+						exposta no código-fonte da página, não permite fazer nada além de
+						acompanhar uma apresentação.
+					</p>
+				</div>
+			</div>
+
+			<div id="output-box" class="output-box" hidden>
+				<button
+					id="copy-btn"
+					class="copy-btn"
+					type="button"
+					title="Copiar"
+					aria-label="Copiar"
+				>
+					<svg
+						class="icon icon-copy"
+						width="18"
+						height="18"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+						<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+					</svg>
+					<svg
+						class="icon icon-check"
+						width="18"
+						height="18"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<path d="M20 6 9 17l-5-5" />
+					</svg>
+				</button>
+				<pre id="setup-output" class="output"></pre>
+			</div>
+			<p id="setup-result-hint" class="hint" hidden>
+				Copie o conteúdo acima e cole em <code>ably-config.json</code>.
+			</p>
+		</div>
+
+		<script src="../js/crypto.js"></script>
+		<script src="setup.js"></script>
+		<script src="https://unpkg.com/lucide@latest"></script>
+	</body>
+</html>
