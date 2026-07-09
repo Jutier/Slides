@@ -16,7 +16,7 @@ async function loadPresentation(slug, viewMode) {
 	const theme = doc.querySelector('meta[name="reveal-theme"]')?.content
 	if (theme) {
 		document.getElementById("reveal-theme").href =
-			`https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/${theme}.css`
+			`revealjs6/theme/${theme}.css`
 	}
 
 	// Config base, igual pra qualquer apresentação e qualquer papel.
